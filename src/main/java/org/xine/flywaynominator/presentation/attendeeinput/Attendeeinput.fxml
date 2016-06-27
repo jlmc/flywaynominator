@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="243.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2"
+ fx:controller="org.xine.flywaynominator.presentation.attendeeinput.AttendeeinputPresenter">
+  <!-- TODO Add Nodes -->
+  <children>
+    <VBox id="VBox" fx:id="inputBox" alignment="CENTER" layoutX="100.0" layoutY="33.0" prefWidth="343.0" spacing="5.0">
+      <children>
+        <TextField fx:id="releaseName" prefWidth="200.0" promptText="Release Name" />
+        <TextField fx:id="firtsIndex" prefWidth="200.0" promptText="Firts Index" />
+        <TextField fx:id="taskName" prefWidth="200.0" promptText="Task Name" />
+      </children>
+    </VBox>
+  </children>
+  <stylesheets>
+    <URL value="@attendeeinput.css" />
+  </stylesheets>
+</AnchorPane>

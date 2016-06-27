@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="250.0" prefHeight="300.0" prefWidth="525.0" styleClass="airpad" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="org.xine.flywaynominator.presentation.dashboard.DashboardPresenter">
+  <!-- TODO Add Nodes -->
+  <children>
+    <SplitPane dividerPositions="0.5" focusTraversable="true" orientation="VERTICAL" prefHeight="290.0" prefWidth="515.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+      <items>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" fx:id="input">
+        	
+        
+        </AnchorPane>
+        <AnchorPane fx:id="overview" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+          <children>
+          
+          
+          
+<!--             <Button fx:id="bttest" layoutX="176.0" layoutY="61.0" mnemonicParsing="false" onAction="#lancher" text="Button" /> -->
+<!--             <Label fx:id="lbtest" layoutX="314.0" layoutY="60.0" prefHeight="20.999908447265625" text="Label" /> -->
+          </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+</AnchorPane>
