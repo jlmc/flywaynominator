@@ -6,6 +6,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
@@ -32,26 +33,25 @@ public class Migration {
 		this.file = file;
 
 		Optional<BasicFileAttributes> attrs  = getBasicAtributes();
-		
+
 		String name = file.getName();
 		this.fileName = new SimpleStringProperty(name);
 		this.fileSize = new ReadOnlyDoubleWrapper(Double.valueOf(file.length()) / 1024) ;
 		LocalDateTime createdDate = attrs.map(b -> b.creationTime()).
-									   map(f-> LocalDateTime.ofInstant(f.toInstant(), ZoneId.systemDefault())).
-									   orElse( LocalDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault()));
-		
+				map(f-> LocalDateTime.ofInstant(f.toInstant(), ZoneId.systemDefault())).
+				orElse( LocalDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault()));
+
 		this.createAt = new ReadOnlyObjectWrapper<LocalDateTime>(createdDate); 
-		
 	}
-	
+
 	public ObjectProperty<LocalDateTime> getCreateAtProperty() {
 		return this.createAt;
 	}
-	
+
 	public LocalDateTime getCreateAt() {
 		return this.createAt.get();
 	}
-	
+
 	private Optional<BasicFileAttributes> getBasicAtributes() {
 		try {
 			BasicFileAttributes fileAtr = Files.readAttributes(this.file.toPath(), BasicFileAttributes.class);
@@ -61,11 +61,11 @@ public class Migration {
 			return Optional.empty();
 		}
 	}
-	
+
 	public ReadOnlyDoubleProperty getFileSizeProperty() {
 		return this.fileSize;
 	}
-	
+
 	public Double getFileSize() {
 		return this.fileSize.get();
 	}
@@ -80,5 +80,18 @@ public class Migration {
 
 	public void setFileName(final String fileName) {
 		fileNameProperty().set(fileName);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.file);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof Migration) {
+			return Objects.equals(this.file, ((Migration)obj).file);
+		}
+		return false;
 	}
 }

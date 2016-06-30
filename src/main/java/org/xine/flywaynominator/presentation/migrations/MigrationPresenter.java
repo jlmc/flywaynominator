@@ -90,6 +90,9 @@ public class MigrationPresenter implements Initializable {
 	private void loadFromStore(String filePath) {
 		List<Migration> all = this.service.all(filePath);
 		for (Migration migration : all) {
+			if (this.migrations.contains(migration)) {
+				continue;
+			}
 			add(migration);
 		}
 	}
