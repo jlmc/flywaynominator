@@ -1,10 +1,15 @@
 package org.xine.flywaynominator.presentation.migrations;
 
+import java.io.File;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.inject.Inject;
+
+import org.xine.flywaynominator.business.migration.boundary.MigrationService;
 import org.xine.flywaynominator.business.migration.entity.Migration;
 
 import javafx.collections.FXCollections;
@@ -17,6 +22,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.util.converter.LocalDateTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
@@ -25,6 +32,9 @@ public class MigrationPresenter implements Initializable {
 	private ObservableList<Migration> migrations;  
 
 	@FXML private TableView<Migration> migrationsTable;
+	
+	@Inject
+	MigrationService service;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -50,8 +60,40 @@ public class MigrationPresenter implements Initializable {
 		this.migrationsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		this.migrationsTable.setItems(this.migrations);
 		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		
+		
+		setOnDrag();
 	}
 
+	private void setOnDrag() {
+		this.migrationsTable.setOnDragOver(event -> {
+			 Dragboard db = event.getDragboard();
+		     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+			 event.consume();
+		});
+		
+		this.migrationsTable.setOnDragDropped(event -> {
+			 Dragboard db = event.getDragboard();
+			 boolean success = false;
+			 System.out.println(db.hasFiles());
+             if (db.hasFiles()) {
+            	 List<File> sourceFolders = db.getFiles();
+            	 File source = sourceFolders.get(0);
+            	 String filePath = source.getAbsolutePath();
+            	 loadFromStore(filePath);
+            	 success = true;
+             }
+             event.consume();
+		});
+	}
+
+	private void loadFromStore(String filePath) {
+		List<Migration> all = this.service.all(filePath);
+		for (Migration migration : all) {
+			add(migration);
+		}
+	}
+	
 	private TableColumn<Migration, LocalDateTime> createLocalDateTimeColumn(String name, String caption){
 		TableColumn<Migration, LocalDateTime> column = new TableColumn<>(caption);
 		appendEditListeners(column);
