@@ -12,6 +12,8 @@ import javax.inject.Inject;
 import org.xine.flywaynominator.business.migration.boundary.MigrationService;
 import org.xine.flywaynominator.business.migration.entity.Migration;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,7 +21,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Dragboard;
@@ -29,7 +30,12 @@ import javafx.util.converter.NumberStringConverter;
 
 public class MigrationPresenter implements Initializable {
 
-	private ObservableList<Migration> migrations;  
+	//private ObservableList<Migration> migrations;  
+	
+	/////////////
+	private ListProperty<Migration> migrationsProperty;
+	
+	
 
 	@FXML private TableView<Migration> migrationsTable;
 	
@@ -38,12 +44,24 @@ public class MigrationPresenter implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		this.migrations = FXCollections.observableArrayList();
+		this.migrationsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+		
+		
+		
+		//this.migrations = FXCollections.observableArrayList();
 		prepareTable();
 	}
+	
+	public ListProperty<Migration> getMigrationsProperty() {
+		return this.migrationsProperty;
+	}
 
+	
+	
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void prepareTable() {
-		this.migrationsTable.setEditable(true);
+		this.migrationsTable.setEditable(false);
 		ObservableList<TableColumn<Migration, ?>> columns = this.migrationsTable.getColumns();
 
 		final TableColumn<Migration, String> fileNameColumn = createTextColumn("fileName", "File Name");
@@ -58,30 +76,26 @@ public class MigrationPresenter implements Initializable {
 		columns.add(fileCreateAt);
 
 		this.migrationsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		this.migrationsTable.setItems(this.migrations);
+		this.migrationsTable.setItems(getMigrations());
 		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		
 		
 		setOnDrag();
 	}
 
 	private void setOnDrag() {
 		this.migrationsTable.setOnDragOver(event -> {
-			 Dragboard db = event.getDragboard();
 		     event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 			 event.consume();
 		});
 		
 		this.migrationsTable.setOnDragDropped(event -> {
 			 Dragboard db = event.getDragboard();
-			 boolean success = false;
 			 System.out.println(db.hasFiles());
              if (db.hasFiles()) {
             	 List<File> sourceFolders = db.getFiles();
             	 File source = sourceFolders.get(0);
             	 String filePath = source.getAbsolutePath();
             	 loadFromStore(filePath);
-            	 success = true;
              }
              event.consume();
 		});
@@ -90,7 +104,7 @@ public class MigrationPresenter implements Initializable {
 	private void loadFromStore(String filePath) {
 		List<Migration> all = this.service.all(filePath);
 		for (Migration migration : all) {
-			if (this.migrations.contains(migration)) {
+			if (getMigrations().contains(migration)) {
 				continue;
 			}
 			add(migration);
@@ -105,6 +119,7 @@ public class MigrationPresenter implements Initializable {
 		return column;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private TableColumn createDoubleColumn(String name, String caption){
 		TableColumn column = new TableColumn<>(caption);
 		appendEditListeners(column);
@@ -113,34 +128,37 @@ public class MigrationPresenter implements Initializable {
 		return column;
 	}
 	
-	private TableColumn createBooleanColumn(String name, String caption) {
-		TableColumn column = new TableColumn(caption);
-		appendEditListeners(column);
-		column.setCellValueFactory(new PropertyValueFactory<Migration, Boolean>(name));
-		column.setCellFactory(CheckBoxTableCell.forTableColumn(column));
-		return column;
-	}
+//	private TableColumn<Migration, Boolean> createBooleanColumn(String name, String caption) {
+//		TableColumn<Migration, Boolean> column = new TableColumn<Migration, Boolean>(caption);
+//		appendEditListeners(column);
+//		column.setCellValueFactory(new PropertyValueFactory<Migration, Boolean>(name));
+//		column.setCellFactory(CheckBoxTableCell.forTableColumn(column));
+//		return column;
+//	}
 
-	private TableColumn createTextColumn(String name, String caption) {
-		TableColumn column = new TableColumn(caption);
+	private TableColumn<Migration, String> createTextColumn(String name, String caption) {
+		TableColumn<Migration, String> column = new TableColumn<Migration, String>(caption);
 		appendEditListeners(column);
 		column.setCellValueFactory(new PropertyValueFactory<Migration, String>(name));
 		column.setCellFactory(TextFieldTableCell.forTableColumn());
 		return column;
 	}
 
-	private void appendEditListeners(TableColumn column) {
-		column.setOnEditStart(e -> {
-			System.out.println("edit started");
-		});
-
-		column.setOnEditCancel(e -> {
-			System.out.println("edit canceled");
-		});
-
+	@SuppressWarnings("rawtypes")
+	private void appendEditListeners( TableColumn column) {
+//		column.setOnEditStart(e -> {
+//			// nothing 
+//		});
+//
+//		column.setOnEditCancel(e -> {
+//		});
 	}
 
 	public void add(Migration migration) {
-		this.migrations.add(migration);
+		getMigrations().add(migration);
+	}
+	
+	public ObservableList<Migration> getMigrations(){
+		return this.migrationsProperty.get();
 	}
 }

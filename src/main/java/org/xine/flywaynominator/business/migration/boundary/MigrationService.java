@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.xine.flywaynominator.business.migration.entity.Attendee;
 import org.xine.flywaynominator.business.migration.entity.Migration;
 
 public class MigrationService {
@@ -17,6 +18,14 @@ public class MigrationService {
 					.collect(Collectors.toList());
 		
 		return migrations;
+	}
+
+	public void changeNames(Attendee value, List<Migration> migrations) {
+		int index = Integer.valueOf(value.getFirtsIndex());
+		for (Migration m : migrations) {
+			m.change(value.getReleaseName(), index, value.getTaskName());
+			index++;
+		}
 	}
 
 }

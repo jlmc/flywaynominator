@@ -18,7 +18,7 @@ import javafx.beans.property.StringProperty;
 
 public class Migration {
 
-	private final File file;
+	private File file;
 
 	private StringProperty fileName;
 	private ReadOnlyDoubleProperty fileSize;
@@ -27,7 +27,7 @@ public class Migration {
 
 	public Migration(File file) {
 		if (file == null || !file.exists() || file.isDirectory()) {
-			throw new IllegalArgumentException("the file should be a existing file, never and directory.");
+			throw new IllegalArgumentException("the file should be a existing file and directory.");
 		}
 
 		this.file = file;
@@ -94,4 +94,16 @@ public class Migration {
 		}
 		return false;
 	}
+	
+	public void change(String realease, Integer index, String task) {
+		String name = this.file.getName();
+		String parent = this.file.getParent();
+		String newName = realease + "." + index + "__" + task +"_"+ name;
+		File newFile = new File(parent + "\\" + newName);
+		this.file.renameTo(newFile);
+		
+		this.file = newFile;
+		this.fileName.set(newFile.getName());
+	}
+
 }
