@@ -1,7 +1,6 @@
 package org.xine.flywaynominator.presentation.dashboard;
 
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -29,7 +28,7 @@ public class DashboardPresenter implements Initializable {
 	@FXML private AnchorPane input;
 	@FXML private AnchorPane overview;
 
-	@Inject private LocalDate date;
+	//@Inject private LocalDate date;
 	@Inject MigrationService service;
 
 	private AttendeeinputPresenter attendeeinputPresenter;
@@ -40,7 +39,7 @@ public class DashboardPresenter implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		this.migrationsProperty = new SimpleListProperty(FXCollections.observableArrayList());
+		this.migrationsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 		this.attendee = new SimpleObjectProperty<>();
 		
 		
