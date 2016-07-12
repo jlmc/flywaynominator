@@ -24,18 +24,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.TransferMode;
 import javafx.util.converter.LocalDateTimeStringConverter;
 import javafx.util.converter.NumberStringConverter;
 
 public class MigrationPresenter implements Initializable {
-
-	//private ObservableList<Migration> migrations;  
-	
-	/////////////
 	private ListProperty<Migration> migrationsProperty;
-	
-	
 
 	@FXML private TableView<Migration> migrationsTable;
 	
@@ -45,10 +40,6 @@ public class MigrationPresenter implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		this.migrationsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-		
-		
-		
-		//this.migrations = FXCollections.observableArrayList();
 		prepareTable();
 	}
 	
@@ -56,21 +47,20 @@ public class MigrationPresenter implements Initializable {
 		return this.migrationsProperty;
 	}
 
-	
-	
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void prepareTable() {
 		this.migrationsTable.setEditable(false);
-		ObservableList<TableColumn<Migration, ?>> columns = this.migrationsTable.getColumns();
+		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		final ObservableList<TableColumn<Migration, ?>> columns = this.migrationsTable.getColumns();
 
 		final TableColumn<Migration, String> fileNameColumn = createTextColumn("fileName", "File Name");
 		columns.add(fileNameColumn);
-		TableColumn fileSizeColumn = createDoubleColumn("fileSize", "File Size (KB)");
+		final TableColumn fileSizeColumn = createDoubleColumn("fileSize", "File Size (KB)");
 		fileSizeColumn.setMaxWidth(150.0D);
 		fileSizeColumn.setStyle("-fx-alignment: CENTER-RIGHT;");
 		columns.add(fileSizeColumn);
-		TableColumn<Migration, LocalDateTime> fileCreateAt = createLocalDateTimeColumn("createAt", " Create At");
+		final TableColumn<Migration, LocalDateTime> fileCreateAt = createLocalDateTimeColumn("createAt", " Create At");
 		fileCreateAt.setMaxWidth(150.0D);
 		fileCreateAt.setStyle("-fx-alignment: CENTER-RIGHT;");
 		columns.add(fileCreateAt);
@@ -80,6 +70,24 @@ public class MigrationPresenter implements Initializable {
 		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		
 		setOnDrag();
+		setOnDeleteRows();
+	}
+
+	private void setOnDeleteRows() {
+		this.migrationsTable.setOnKeyPressed(e -> {
+			if (KeyCode.DELETE != e.getCode()) {
+				return;
+			}
+
+			final ObservableList<Migration> selectedItems = this.migrationsTable.getSelectionModel().getSelectedItems();
+			if (selectedItems.isEmpty()) {
+				return;
+			}
+
+			this.migrationsProperty.removeAll(selectedItems);
+			this.migrationsTable.getSelectionModel().clearSelection();
+			e.consume();
+		});
 	}
 
 	private void setOnDrag() {
@@ -89,12 +97,12 @@ public class MigrationPresenter implements Initializable {
 		});
 		
 		this.migrationsTable.setOnDragDropped(event -> {
-			 Dragboard db = event.getDragboard();
+			 final Dragboard db = event.getDragboard();
 			 System.out.println(db.hasFiles());
              if (db.hasFiles()) {
-            	 List<File> sourceFolders = db.getFiles();
-            	 File source = sourceFolders.get(0);
-            	 String filePath = source.getAbsolutePath();
+            	 final List<File> sourceFolders = db.getFiles();
+            	 final File source = sourceFolders.get(0);
+            	 final String filePath = source.getAbsolutePath();
             	 loadFromStore(filePath);
              }
              event.consume();
@@ -102,8 +110,8 @@ public class MigrationPresenter implements Initializable {
 	}
 
 	private void loadFromStore(String filePath) {
-		List<Migration> all = this.service.all(filePath);
-		for (Migration migration : all) {
+		final List<Migration> all = this.service.all(filePath);
+		for (final Migration migration : all) {
 			if (getMigrations().contains(migration)) {
 				continue;
 			}
@@ -112,7 +120,7 @@ public class MigrationPresenter implements Initializable {
 	}
 	
 	private TableColumn<Migration, LocalDateTime> createLocalDateTimeColumn(String name, String caption){
-		TableColumn<Migration, LocalDateTime> column = new TableColumn<>(caption);
+		final TableColumn<Migration, LocalDateTime> column = new TableColumn<>(caption);
 		appendEditListeners(column);
 		column.setCellValueFactory(new PropertyValueFactory<Migration, LocalDateTime>(name));
 		column.setCellFactory(TextFieldTableCell.forTableColumn(new LocalDateTimeStringConverter()));
@@ -121,7 +129,7 @@ public class MigrationPresenter implements Initializable {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private TableColumn createDoubleColumn(String name, String caption){
-		TableColumn column = new TableColumn<>(caption);
+		final TableColumn column = new TableColumn<>(caption);
 		appendEditListeners(column);
 		column.setCellValueFactory(new PropertyValueFactory<Migration, Double>(name));
 		column.setCellFactory(TextFieldTableCell.forTableColumn(new NumberStringConverter(new DecimalFormat("###.###"))));
@@ -137,7 +145,7 @@ public class MigrationPresenter implements Initializable {
 //	}
 
 	private TableColumn<Migration, String> createTextColumn(String name, String caption) {
-		TableColumn<Migration, String> column = new TableColumn<Migration, String>(caption);
+		final TableColumn<Migration, String> column = new TableColumn<Migration, String>(caption);
 		appendEditListeners(column);
 		column.setCellValueFactory(new PropertyValueFactory<Migration, String>(name));
 		column.setCellFactory(TextFieldTableCell.forTableColumn());
