@@ -50,7 +50,15 @@ public class MigrationPresenter implements Initializable {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void prepareTable() {
 		this.migrationsTable.setEditable(false);
-		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		// table.getSelectionModel().setCellSelectionEnabled(true);
+		// table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		this.migrationsTable.getSelectionModel().setCellSelectionEnabled(true);
+		// this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		this.migrationsTable.setOnMouseClicked(
+				e -> this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE));
 
 		final ObservableList<TableColumn<Migration, ?>> columns = this.migrationsTable.getColumns();
 
