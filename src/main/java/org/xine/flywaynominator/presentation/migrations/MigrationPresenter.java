@@ -54,11 +54,12 @@ public class MigrationPresenter implements Initializable {
 		// table.getSelectionModel().setCellSelectionEnabled(true);
 		// table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		this.migrationsTable.getSelectionModel().setCellSelectionEnabled(true);
+		// this.migrationsTable.getSelectionModel().setCellSelectionEnabled(true);
 		// this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		this.migrationsTable.setOnMouseClicked(
-				e -> this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE));
+		// this.migrationsTable.setOnMouseClicked(
+		// e ->
+		// this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE));
 
 		final ObservableList<TableColumn<Migration, ?>> columns = this.migrationsTable.getColumns();
 
@@ -75,7 +76,7 @@ public class MigrationPresenter implements Initializable {
 
 		this.migrationsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		this.migrationsTable.setItems(getMigrations());
-		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		this.migrationsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		
 		setOnDrag();
 		setOnDeleteRows();
@@ -108,23 +109,24 @@ public class MigrationPresenter implements Initializable {
 			 final Dragboard db = event.getDragboard();
 			 System.out.println(db.hasFiles());
              if (db.hasFiles()) {
-            	 final List<File> sourceFolders = db.getFiles();
-            	 final File source = sourceFolders.get(0);
-            	 final String filePath = source.getAbsolutePath();
-            	 loadFromStore(filePath);
+				final List<File> sources = db.getFiles();
+				loadFromStore(sources);
              }
              event.consume();
 		});
 	}
 
-	private void loadFromStore(String filePath) {
-		final List<Migration> all = this.service.all(filePath);
-		for (final Migration migration : all) {
-			if (getMigrations().contains(migration)) {
-				continue;
+	private void loadFromStore(List<File> sources) {
+		sources.stream().forEach(source -> loadFromStore(source));
+	}
+
+	private void loadFromStore(File source) {
+		final List<Migration> all = this.service.all(source.getAbsolutePath());
+		all.stream().forEach(migration -> {
+			if (!getMigrations().contains(migration)) {
+				add(migration);
 			}
-			add(migration);
-		}
+		});
 	}
 	
 	private TableColumn<Migration, LocalDateTime> createLocalDateTimeColumn(String name, String caption){
