@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 
 public class AttendeeinputPresenter implements Initializable {
 	@FXML private TextField releaseName;
@@ -23,11 +24,20 @@ public class AttendeeinputPresenter implements Initializable {
 	@FXML
 	private Button previewButton;
 
-	private ObjectProperty<Attendee> attendee = new SimpleObjectProperty<Attendee>();
+	private final ObjectProperty<Attendee> attendee = new SimpleObjectProperty<Attendee>();
 
 	@Override
-	public void initialize(URL location, ResourceBundle resources) {
+	public void initialize(final URL location, final ResourceBundle resources) {
 		this.attendee.set(new Attendee());
+		
+		this.firtsIndex.addEventFilter(KeyEvent.KEY_TYPED, t -> {
+            final char ar[] = t.getCharacter().toCharArray();
+            final char ch = ar[t.getCharacter().toCharArray().length - 1];
+            if (!(ch >= '0' && ch <= '9')) {
+               System.out.println("The char you entered is not a number");
+               t.consume();
+            }
+         });
 		
 		getAttendee().releaseNameProperty().bindBidirectional(this.releaseName.textProperty());
 		getAttendee().firtsIndexProperty().bindBidirectional(this.firtsIndex.textProperty());
@@ -44,7 +54,7 @@ public class AttendeeinputPresenter implements Initializable {
 	}
 
 	@FXML
-	void onPreview(ActionEvent event) {
+	void onPreview(final ActionEvent event) {
 		System.out.println("> on Preview");
 		getOnPreview().handle(event);
 	}
@@ -61,9 +71,9 @@ public class AttendeeinputPresenter implements Initializable {
 		attendeeProperty().set(attendee);
 	}
 	
-	private ObjectProperty<EventHandler<ActionEvent>> onPreview = new SimpleObjectProperty<EventHandler<ActionEvent>>();
+	private final ObjectProperty<EventHandler<ActionEvent>> onPreview = new SimpleObjectProperty<EventHandler<ActionEvent>>();
     public final ObjectProperty<EventHandler<ActionEvent>> onPreviewProperty() { return this.onPreview; }
-    public final void setOnPreview(EventHandler<ActionEvent> value) { onPreviewProperty().set(value); }
+    public final void setOnPreview(final EventHandler<ActionEvent> value) { onPreviewProperty().set(value); }
     public final EventHandler<ActionEvent> getOnPreview() { return onPreviewProperty().get(); }
 	
 }
