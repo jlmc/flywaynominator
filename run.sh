@@ -18,4 +18,4 @@
 # limitations under the License.
 # #L%
 echo 'Use Java 8 - comes with javafx in the classpath'
-java -jar target\flywaynominator-app.jar
+java -jar target/flywaynominator-app.jar
